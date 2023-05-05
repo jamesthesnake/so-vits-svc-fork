@@ -336,6 +336,33 @@
       "contributions": [
         "translation"
       ]
+    },
+    {
+      "login": "Highupech",
+      "name": "Highupech",
+      "avatar_url": "https://avatars.githubusercontent.com/u/114140670?v=4",
+      "profile": "https://github.com/Highupech",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "Scorpi",
+      "name": "Scorpi",
+      "avatar_url": "https://avatars.githubusercontent.com/u/969654?v=4",
+      "profile": "https://github.com/Scorpi",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "maximxlss",
+      "name": "Maximxls",
+      "avatar_url": "https://avatars.githubusercontent.com/u/29152154?v=4",
+      "profile": "http://maximxlss.github.io",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,

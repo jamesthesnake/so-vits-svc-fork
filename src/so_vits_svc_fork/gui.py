@@ -29,9 +29,11 @@ def play_audio(path: Path | str):
 
 
 def load_presets() -> dict:
-    defaults = json.loads(GUI_DEFAULT_PRESETS_PATH.read_text())
+    defaults = json.loads(GUI_DEFAULT_PRESETS_PATH.read_text("utf-8"))
     users = (
-        json.loads(GUI_PRESETS_PATH.read_text()) if GUI_PRESETS_PATH.exists() else {}
+        json.loads(GUI_PRESETS_PATH.read_text("utf-8"))
+        if GUI_PRESETS_PATH.exists()
+        else {}
     )
     # prioriy: defaults > users
     # order: defaults -> users
@@ -286,6 +288,16 @@ def main():
                     orientation="h",
                     key="chunk_seconds",
                     resolution=0.01,
+                ),
+            ],
+            [
+                sg.Text("Max chunk seconds (set lower if Out Of Memory, 0 to disable)"),
+                sg.Push(),
+                sg.Slider(
+                    range=(0.0, 240.0),
+                    orientation="h",
+                    key="max_chunk_seconds",
+                    resolution=1.0,
                 ),
             ],
             [
@@ -642,6 +654,7 @@ def main():
                             pad_seconds=values["pad_seconds"],
                             chunk_seconds=values["chunk_seconds"],
                             absolute_thresh=values["absolute_thresh"],
+                            max_chunk_seconds=values["max_chunk_seconds"],
                             device="cpu"
                             if not values["use_gpu"]
                             else get_optimal_device(),

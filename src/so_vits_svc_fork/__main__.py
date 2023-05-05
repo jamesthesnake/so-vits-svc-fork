@@ -202,6 +202,13 @@ def train(
     default=False,
     help="absolute thresh",
 )
+@click.option(
+    "-mc",
+    "--max-chunk-seconds",
+    type=float,
+    default=40,
+    help="maximum allowed single chunk length, set lower if you get out of memory (0 to disable)",
+)
 def infer(
     # paths
     input_path: Path,
@@ -221,6 +228,7 @@ def infer(
     pad_seconds: float = 0.5,
     chunk_seconds: float = 0.5,
     absolute_thresh: bool = False,
+    max_chunk_seconds: float = 40,
     device: str | torch.device = get_optimal_device(),
 ):
     """Inference"""
@@ -264,6 +272,7 @@ def infer(
         pad_seconds=pad_seconds,
         chunk_seconds=chunk_seconds,
         absolute_thresh=absolute_thresh,
+        max_chunk_seconds=max_chunk_seconds,
         device=device,
     )
 
@@ -716,6 +725,45 @@ def pre_split(
     )
 
 
+@cli.command()
+@click.option(
+    "-i",
+    "--input-dir",
+    type=click.Path(exists=True),
+    required=True,
+    help="path to source dir",
+)
+@click.option(
+    "-o",
+    "--output-dir",
+    type=click.Path(),
+    default=None,
+    help="path to output dir",
+)
+@click.option(
+    "-c/-nc",
+    "--create-new/--no-create-new",
+    type=bool,
+    default=True,
+    help="create a new folder for the speaker if not exist",
+)
+def pre_classify(
+    input_dir: Path | str,
+    output_dir: Path | str | None,
+    create_new: bool,
+) -> None:
+    """Classify multiple audio files into multiple files"""
+    from so_vits_svc_fork.preprocessing.preprocess_classify import preprocess_classify
+
+    if output_dir is None:
+        output_dir = input_dir
+    preprocess_classify(
+        input_dir=input_dir,
+        output_dir=output_dir,
+        create_new=create_new,
+    )
+
+
 @cli.command
 def clean():
     """Clean up files, only useful if you are using the default file structure"""
@@ -763,8 +811,8 @@ def clean():
 def onnx(
     input_path: Path, output_path: Path, config_path: Path, device: torch.device | str
 ) -> None:
+    """Export model to onnx (currently not working)"""
     raise NotImplementedError("ONNX export is not yet supported")
-    """Export model to onnx"""
     input_path = Path(input_path)
     if input_path.is_dir():
         input_path = list(input_path.glob("*.pth"))[0]
