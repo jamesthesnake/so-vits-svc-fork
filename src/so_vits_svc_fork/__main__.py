@@ -7,7 +7,6 @@ from pathlib import Path
 from typing import Literal
 
 import click
-import pyinputplus as pyip
 import torch
 
 from so_vits_svc_fork import __version__
@@ -164,6 +163,14 @@ def train(
     default=None,
     help="path to cluster model",
 )
+@click.option(
+    "-re",
+    "--recursive",
+    type=bool,
+    default=False,
+    help="Search recursively",
+    is_flag=True,
+)
 @click.option("-t", "--transpose", type=int, default=0, help="transpose")
 @click.option(
     "-db", "--db-thresh", type=int, default=-20, help="threshold (DB) (RELATIVE)"
@@ -215,6 +222,7 @@ def infer(
     output_path: Path,
     model_path: Path,
     config_path: Path,
+    recursive: bool,
     # svc config
     speaker: str,
     cluster_model_path: Path | None = None,
@@ -244,6 +252,10 @@ def infer(
     if output_path is None:
         output_path = input_path.parent / f"{input_path.stem}.out{input_path.suffix}"
     output_path = Path(output_path)
+    if input_path.is_dir() and not recursive:
+        raise ValueError(
+            "input_path is a directory. Use 0re or --recursive to infer recursively."
+        )
     model_path = Path(model_path)
     if model_path.is_dir():
         model_path = list(
@@ -259,6 +271,7 @@ def infer(
         output_path=output_path,
         model_path=model_path,
         config_path=config_path,
+        recursive=recursive,
         # svc config
         speaker=speaker,
         cluster_model_path=cluster_model_path,
@@ -770,7 +783,8 @@ def clean():
     import shutil
 
     folders = ["dataset", "filelists", "logs"]
-    if pyip.inputYesNo(f"Are you sure you want to delete files in {folders}?") == "yes":
+    # if pyip.inputYesNo(f"Are you sure you want to delete files in {folders}?") == "yes":
+    if input("Are you sure you want to delete files in {folders}?") in ["yes", "y"]:
         for folder in folders:
             if Path(folder).exists():
                 shutil.rmtree(folder)
